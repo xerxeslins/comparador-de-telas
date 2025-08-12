@@ -42,7 +42,7 @@
     <div class="input-group">
         <h3>1. Especifique seu Monitor</h3>
         <label for="monitorPPI">PPI (Pixels Por Polegada) do seu monitor:</label>
-        <input type="number" id="monitorPPI" value="92" placeholder="Ex: 92">
+        <input type="number" id="monitorPPI" value="102.46" placeholder="Ex: 102.46">
         <a id="toggleCalculator" onclick="toggleCalculator()">Não sabe seu PPI? Clique aqui para calcular.</a>
         <div id="ppiCalculator" class="hidden">
             <h4>Calculadora de PPI</h4>
@@ -62,20 +62,20 @@
 
     <div class="config-area">
         <div class="input-group">
-            <h2>Tela 1</h2>
+            <h2>Tela 1 (Miyoo Mini Plus)</h2>
             <label for="size1">Tamanho Diagonal (polegadas):</label>
             <input type="number" id="size1" value="5.25">
-            <label for="ratio1">Proporção (ex: 4:3, 10.8:7.85):</label>
-            <input type="text" id="ratio1" list="common-ratios" placeholder="Digite ou escolha uma proporção" value="3:4">
+            <label for="ratio1">Proporção (ex: 4:3, 7.85:10.8):</label>
+            <input type="text" id="ratio1" list="common-ratios" placeholder="Digite ou escolha uma proporção" value="7.85:10.8">
             <label for="color1">Cor da Borda:</label>
             <input type="color" id="color1" value="#4A148C">
         </div>
         <div class="input-group">
-            <h2>Tela 2</h2>
+            <h2>Tela 2 (Anbernic RG28XX)</h2>
             <label for="size2">Tamanho Diagonal (polegadas):</label>
-            <input type="number" id="size2" value="5.91">
-            <label for="ratio2">Proporção (ex: 4:3, 12.5:8.3):</label>
-            <input type="text" id="ratio2" list="common-ratios" placeholder="Digite ou escolha uma proporção" value="3:2">
+            <input type="number" id="size2" value="5.40">
+            <label for="ratio2">Proporção (ex: 4:3, 12.5:5.65):</label>
+            <input type="text" id="ratio2" list="common-ratios" placeholder="Digite ou escolha uma proporção" value="12.5:5.65">
             <label for="color2">Cor da Borda:</label>
             <input type="color" id="color2" value="#F48FB1">
         </div>
@@ -154,12 +154,12 @@
 
         const diag1 = parseFloat(document.getElementById('size1').value);
         const ratio1 = document.getElementById('ratio1').value;
-        const color1 = document.getElementById('color1').value; // <--- Corrigido: Pegando a cor
+        const color1 = document.getElementById('color1').value;
         const dim1 = calculateDimensions(diag1, ratio1);
 
         const diag2 = parseFloat(document.getElementById('size2').value);
         const ratio2 = document.getElementById('ratio2').value;
-        const color2 = document.getElementById('color2').value; // <--- Corrigido: Pegando a cor
+        const color2 = document.getElementById('color2').value;
         const dim2 = calculateDimensions(diag2, ratio2);
 
         if (!dim1 || !dim2) {
@@ -173,11 +173,11 @@
         const heightPx2 = dim2.height * monitorPPI;
 
         if (viewMode === 'overlap' && (widthPx1 * heightPx1 < widthPx2 * heightPx2)) {
-            createScreenElement('Tela 2', widthPx2, heightPx2, color2, monitorPPI); // <--- Corrigido: Passando a cor
-            createScreenElement('Tela 1', widthPx1, heightPx1, color1, monitorPPI); // <--- Corrigido: Passando a cor
+            createScreenElement('Tela 2', widthPx2, heightPx2, color2, monitorPPI);
+            createScreenElement('Tela 1', widthPx1, heightPx1, color1, monitorPPI);
         } else {
-            createScreenElement('Tela 1', widthPx1, heightPx1, color1, monitorPPI); // <--- Corrigido: Passando a cor
-            createScreenElement('Tela 2', widthPx2, heightPx2, color2, monitorPPI); // <--- Corrigido: Passando a cor
+            createScreenElement('Tela 1', widthPx1, heightPx1, color1, monitorPPI);
+            createScreenElement('Tela 2', widthPx2, heightPx2, color2, monitorPPI);
         }
     }
 
@@ -199,19 +199,17 @@
 
         const [ratioW, ratioH] = ratioParts;
         const r = ratioW / ratioH;
-        // Verifica se r é um número válido e diferente de zero para evitar divisão por zero ou NaN
         if (isNaN(r) || r === 0) return null; 
 
         const height = diagonal / Math.sqrt(r*r + 1);
         const width = r * height;
         
-        // Verifica se as dimensões calculadas são válidas
         if (isNaN(width) || isNaN(height) || width <= 0 || height <= 0) return null;
 
         return { width, height };
     }
 
-    function createScreenElement(name, widthPx, heightPx, color, ppi) { // <--- Corrigido: Recebendo a cor
+    function createScreenElement(name, widthPx, heightPx, color, ppi) {
         const screenWrapper = document.createElement('div');
         screenWrapper.className = 'screen-wrapper';
         const screenDiv = document.createElement('div');
@@ -224,6 +222,7 @@
         label.className = 'screen-label';
         label.textContent = `${name} (${(widthPx / ppi).toFixed(1)}" x ${(heightPx / ppi).toFixed(1)}")`;
         screenDiv.appendChild(label);
+        // *** LINHA CORRIGIDA ***
         screenWrapper.appendChild(screenDiv);
         displayArea.appendChild(screenWrapper);
     }
