@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Comparador de Tamanho Físico de Telas</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f0f0f0; color: #333; padding: 20px; }
+        .container { max-width: 1200px; margin: auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1, h2, h3, h4 { text-align: center; color: #1a237e; }
+        .config-area { display: flex; flex-wrap: wrap; justify-content: space-around; margin-top: 20px; padding-top: 20px; border-top: 1px solid #ccc; }
+        .input-group { margin-bottom: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #fafafa; min-width: 250px; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .input-group input, .input-group select { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { display: block; width: 100%; padding: 12px; background-color: #3949ab; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 20px; }
+        button:hover { background-color: #1a237e; }
+        
+        #ppiCalculator { background-color: #e8eaf6; padding: 15px; border-radius: 5px; margin-top: 10px; }
+        .hidden { display: none; }
+        .ppi-input-row { display: flex; gap: 10px; align-items: center; }
+        .ppi-input-row input { width: 80px; }
+        #ppiResult { font-weight: bold; color: #283593; margin-top: 10px; }
+        #toggleCalculator { font-size: 12px; color: #3949ab; cursor: pointer; text-decoration: underline; display: inline-block; margin-top: 5px; }
+
+        .view-options { text-align: center; margin: 20px 0; }
+        .view-options label { margin: 0 10px; cursor: pointer; }
+        
+        #calibrationArea { padding: 20px; margin-top: 20px; border: 1px solid #b0bec5; background-color: #eceff1; border-radius: 5px; text-align: center; }
+        #creditCard { border: 1px dashed #37474f; background-color: #cfd8dc; border-radius: 3.5mm; display: inline-block; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        #creditCard .screen-label { color: #263238; background: none; }
+        #displayArea { position: relative; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; min-height: 400px; border-top: 1px dashed #aaa; margin-top: 20px; padding: 20px 10px; }
+        #displayArea.overlap .screen-wrapper { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); margin: 0; }
+        .screen-wrapper { margin: 10px; text-align: center; }
+        .screen { border: 3px solid; background-color: rgba(0, 0, 0, 0.1); display: inline-block; position: relative; }
+        .screen-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; background-color: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 3px; font-size: 14px; white-space: nowrap; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Comparador de Tamanho Físico de Telas</h1>
+
+    <!-- PASSO 1: CONFIGURAÇÃO DO MONITOR -->
+    <div class="input-group">
+        <h3>1. Especifique seu Monitor</h3>
+        <label for="monitorPPI">PPI (Pixels Por Polegada) do seu monitor:</label>
+        <input type="number" id="monitorPPI" value="92" placeholder="Ex: 92">
+        <a id="toggleCalculator" onclick="toggleCalculator()">Não sabe seu PPI? Clique aqui para calcular.</a>
+        <div id="ppiCalculator" class="hidden">
+            <h4>Calculadora de PPI</h4>
+            <label>Resolução (pixels):</label>
+            <div class="ppi-input-row"><input type="number" id="resW" placeholder="Largura"><span>x</span><input type="number" id="resH" placeholder="Altura"></div>
+            <label style="margin-top: 10px;">Diagonal (polegadas):</label>
+            <input type="number" id="diagInches" placeholder="Ex: 24">
+            <div id="ppiResult"></div>
+        </div>
+    </div>
+
+    <!-- PASSO 2: ÁREA DE CALIBRAÇÃO (MOVIDA PARA CIMA) -->
+    <div id="calibrationArea">
+        <h3>2. Calibração (Verifique seu PPI)</h3>
+        <p>Ajuste o valor do PPI acima até que o retângulo abaixo tenha o mesmo tamanho de um cartão de crédito físico. Segure um cartão contra a tela para comparar.</p>
+        <div id="creditCard">
+            <div class="screen-label">Cartão de Crédito</div>
+        </div>
+    </div>
+
+    <!-- PASSO 3: CONFIGURAÇÃO DAS TELAS -->
+    <div class="config-area">
+        <div class="input-group">
+            <h2>Tela 1</h2>
+            <label for="size1">Tamanho Diagonal (polegadas):</label>
+            <input type="number" id="size1" value="5.4">
+            <label for="ratio1">Proporção (Aspect Ratio):</label>
+            <select id="ratio1">
+                <option value="19.5:9">19.5:9 (iPhone Mini)</option>
+                <option value="16:10">16:10</option>
+                <option value="4:3">4:3</option>
+                <option value="16:9">16:9</option>
+            </select>
+            <label for="color1">Cor da Borda:</label>
+            <input type="color" id="color1" value="#4A148C">
+        </div>
+        <div class="input-group">
+            <h2>Tela 2</h2>
+            <label for="size2">Tamanho Diagonal (polegadas):</label>
+            <input type="number" id="size2" value="6.7">
+            <label for="ratio2">Proporção (Aspect Ratio):</label>
+            <select id="ratio2">
+                <option value="19.5:9">19.5:9 (iPhone Pro Max)</option>
+                <option value="16:9">16:9</option>
+                <option value="16:10">16:10</option>
+                <option value="4:3">4:3</option>
+            </select>
+            <label for="color2">Cor da Borda:</label>
+            <input type="color" id="color2" value="#F48FB1">
+        </div>
+    </div>
+
+    <div class="view-options">
+        <h3>Modo de Visualização</h3>
+        <label><input type="radio" name="viewMode" value="side-by-side" checked> Lado a Lado</label>
+        <label><input type="radio" name="viewMode" value="overlap"> Sobreposto</label>
+    </div>
+
+    <button onclick="updateAllVisuals()">Comparar Tamanhos</button>
+
+    <h2>Visualização em Tamanho Real</h2>
+    <div id="displayArea"></div>
+</div>
+
+<script>
+    const CC_WIDTH_IN = 3.370;
+    const CC_HEIGHT_IN = 2.125;
+
+    const monitorPPIInput = document.getElementById('monitorPPI');
+    const displayArea = document.getElementById('displayArea');
+    const creditCardDiv = document.getElementById('creditCard');
+    
+    const ppiCalculatorDiv = document.getElementById('ppiCalculator');
+    const toggleLink = document.getElementById('toggleCalculator');
+    const resWInput = document.getElementById('resW');
+    const resHInput = document.getElementById('resH');
+    const diagInchesInput = document.getElementById('diagInches');
+    const ppiResultDiv = document.getElementById('ppiResult');
+    function toggleCalculator() { ppiCalculatorDiv.classList.toggle('hidden'); toggleLink.textContent = ppiCalculatorDiv.classList.contains('hidden') ? "Não sabe seu PPI? Clique aqui para calcular." : "Esconder calculadora."; }
+    function calculateAndUpdatePPI() {
+        const w = parseFloat(resWInput.value);
+        const h = parseFloat(resHInput.value);
+        const d = parseFloat(diagInchesInput.value);
+        if (w > 0 && h > 0 && d > 0) {
+            const ppi = Math.sqrt(w*w + h*h) / d;
+            ppiResultDiv.textContent = `PPI Calculado: ${ppi.toFixed(2)}`;
+            monitorPPIInput.value = ppi.toFixed(2);
+            updateAllVisuals();
+        } else { ppiResultDiv.textContent = ''; }
+    }
+    resWInput.addEventListener('input', calculateAndUpdatePPI);
+    resHInput.addEventListener('input', calculateAndUpdatePPI);
+    diagInchesInput.addEventListener('input', calculateAndUpdatePPI);
+    monitorPPIInput.addEventListener('input', updateAllVisuals);
+
+    function updateAllVisuals() {
+        const monitorPPI = parseFloat(monitorPPIInput.value);
+        if (!monitorPPI || monitorPPI <= 0) { return; }
+        
+        const ccWidthPx = CC_WIDTH_IN * monitorPPI;
+        const ccHeightPx = CC_HEIGHT_IN * monitorPPI;
+        creditCardDiv.style.width = `${ccWidthPx}px`;
+        creditCardDiv.style.height = `${ccHeightPx}px`;
+
+        compareScreens(monitorPPI);
+    }
+
+    function compareScreens(monitorPPI) {
+        displayArea.innerHTML = '';
+        const viewMode = document.querySelector('input[name="viewMode"]:checked').value;
+        displayArea.className = '';
+        if (viewMode === 'overlap') { displayArea.classList.add('overlap'); }
+
+        const diag1 = parseFloat(document.getElementById('size1').value);
+        const ratio1 = document.getElementById('ratio1').value;
+        const color1 = document.getElementById('color1').value;
+        const dim1 = calculateDimensions(diag1, ratio1);
+        const widthPx1 = dim1.width * monitorPPI;
+        const heightPx1 = dim1.height * monitorPPI;
+
+        const diag2 = parseFloat(document.getElementById('size2').value);
+        const ratio2 = document.getElementById('ratio2').value;
+        const color2 = document.getElementById('color2').value;
+        const dim2 = calculateDimensions(diag2, ratio2);
+        const widthPx2 = dim2.width * monitorPPI;
+        const heightPx2 = dim2.height * monitorPPI;
+
+        if (viewMode === 'overlap' && (widthPx1 * heightPx1 < widthPx2 * heightPx2)) {
+            createScreenElement('Tela 2', widthPx2, heightPx2, color2, monitorPPI);
+            createScreenElement('Tela 1', widthPx1, heightPx1, color1, monitorPPI);
+        } else {
+            createScreenElement('Tela 1', widthPx1, heightPx1, color1, monitorPPI);
+            createScreenElement('Tela 2', widthPx2, heightPx2, color2, monitorPPI);
+        }
+    }
+
+    function parseRatio(ratioStr) { return ratioStr.includes(':') ? ratioStr.split(':').map(Number) : [16, 9]; }
+
+    function calculateDimensions(diagonal, ratioStr) {
+        const [ratioW, ratioH] = parseRatio(ratioStr);
+        const r = ratioW / ratioH;
+        const height = diagonal / Math.sqrt(r*r + 1);
+        const width = r * height;
+        return { width, height };
+    }
+
+    function createScreenElement(name, widthPx, heightPx, color, ppi) {
+        const screenWrapper = document.createElement('div');
+        screenWrapper.className = 'screen-wrapper';
+        const screenDiv = document.createElement('div');
+        screenDiv.className = 'screen';
+        screenDiv.style.width = `${widthPx}px`;
+        screenDiv.style.height = `${heightPx}px`;
+        screenDiv.style.borderColor = color;
+        screenDiv.style.backgroundColor = `${color}50`;
+        const label = document.createElement('div');
+        label.className = 'screen-label';
+        label.textContent = `${name} (${(widthPx / ppi).toFixed(1)}" x ${(heightPx / ppi).toFixed(1)}")`;
+        screenDiv.appendChild(label);
+        screenWrapper.appendChild(screenDiv);
+        displayArea.appendChild(screenWrapper);
+    }
+    
+    window.onload = updateAllVisuals;
+</script>
+
+</body>
+</html>
