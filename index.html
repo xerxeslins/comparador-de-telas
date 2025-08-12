@@ -39,7 +39,6 @@
 <div class="container">
     <h1>Comparador de Tamanho Físico de Telas</h1>
 
-    <!-- PASSO 1: CONFIGURAÇÃO DO MONITOR -->
     <div class="input-group">
         <h3>1. Especifique seu Monitor</h3>
         <label for="monitorPPI">PPI (Pixels Por Polegada) do seu monitor:</label>
@@ -55,48 +54,42 @@
         </div>
     </div>
 
-    <!-- PASSO 2: ÁREA DE CALIBRAÇÃO (MOVIDA PARA CIMA) -->
     <div id="calibrationArea">
         <h3>2. Calibração (Verifique seu PPI)</h3>
-        <p>Ajuste o valor do PPI acima até que o retângulo abaixo tenha o mesmo tamanho de um cartão de crédito físico. Segure um cartão contra a tela para comparar.</p>
-        <div id="creditCard">
-            <div class="screen-label">Cartão de Crédito</div>
-        </div>
+        <p>Ajuste o valor do PPI acima até que o retângulo abaixo tenha o mesmo tamanho de um cartão de crédito físico.</p>
+        <div id="creditCard"><div class="screen-label">Cartão de Crédito</div></div>
     </div>
 
-    <!-- PASSO 3: CONFIGURAÇÃO DAS TELAS -->
     <div class="config-area">
         <div class="input-group">
             <h2>Tela 1</h2>
             <label for="size1">Tamanho Diagonal (polegadas):</label>
-            <input type="number" id="size1" value="5.4">
-            <label for="ratio1">Proporção (Aspect Ratio):</label>
-            <select id="ratio1">
-                <option value="19.5:9">19.5:9 (iPhone Mini)</option>
-                <option value="16:10">16:10</option>
-                <option value="3:2">3:2</option>
-                <option value="4:3">4:3</option>
-                <option value="16:9">16:9</option>
-            </select>
+            <input type="number" id="size1" value="5.25">
+            <label for="ratio1">Proporção (ex: 4:3, 10.8:7.85):</label>
+            <input type="text" id="ratio1" list="common-ratios" placeholder="Digite ou escolha uma proporção" value="3:4">
             <label for="color1">Cor da Borda:</label>
             <input type="color" id="color1" value="#4A148C">
         </div>
         <div class="input-group">
             <h2>Tela 2</h2>
             <label for="size2">Tamanho Diagonal (polegadas):</label>
-            <input type="number" id="size2" value="6.7">
-            <label for="ratio2">Proporção (Aspect Ratio):</label>
-            <select id="ratio2">
-                <option value="19.5:9">19.5:9 (iPhone Mini)</option>
-                <option value="16:10">16:10</option>
-                <option value="3:2">3:2</option>
-                <option value="4:3">4:3</option>
-                <option value="16:9">16:9</option>
-            </select>
+            <input type="number" id="size2" value="5.91">
+            <label for="ratio2">Proporção (ex: 4:3, 12.5:8.3):</label>
+            <input type="text" id="ratio2" list="common-ratios" placeholder="Digite ou escolha uma proporção" value="3:2">
             <label for="color2">Cor da Borda:</label>
             <input type="color" id="color2" value="#F48FB1">
         </div>
     </div>
+
+    <datalist id="common-ratios">
+        <option value="4:3">4:3 (Retângulo Padrão)</option>
+        <option value="3:4">3:4 (Retângulo Vertical)</option>
+        <option value="3:2">3:2 (Paisagem Larga)</option>
+        <option value="2:3">2:3 (Vertical Alto)</option>
+        <option value="16:9">16:9 (Widescreen)</option>
+        <option value="9:16">9:16 (Widescreen Vertical)</option>
+        <option value="19.5:9">19.5:9 (Smartphone Moderno)</option>
+    </datalist>
 
     <div class="view-options">
         <h3>Modo de Visualização</h3>
@@ -161,38 +154,64 @@
 
         const diag1 = parseFloat(document.getElementById('size1').value);
         const ratio1 = document.getElementById('ratio1').value;
-        const color1 = document.getElementById('color1').value;
+        const color1 = document.getElementById('color1').value; // <--- Corrigido: Pegando a cor
         const dim1 = calculateDimensions(diag1, ratio1);
-        const widthPx1 = dim1.width * monitorPPI;
-        const heightPx1 = dim1.height * monitorPPI;
 
         const diag2 = parseFloat(document.getElementById('size2').value);
         const ratio2 = document.getElementById('ratio2').value;
-        const color2 = document.getElementById('color2').value;
+        const color2 = document.getElementById('color2').value; // <--- Corrigido: Pegando a cor
         const dim2 = calculateDimensions(diag2, ratio2);
+
+        if (!dim1 || !dim2) {
+            console.error("Cálculo de dimensão falhou. Verifique as proporções.");
+            return;
+        }
+
+        const widthPx1 = dim1.width * monitorPPI;
+        const heightPx1 = dim1.height * monitorPPI;
         const widthPx2 = dim2.width * monitorPPI;
         const heightPx2 = dim2.height * monitorPPI;
 
         if (viewMode === 'overlap' && (widthPx1 * heightPx1 < widthPx2 * heightPx2)) {
-            createScreenElement('Tela 2', widthPx2, heightPx2, color2, monitorPPI);
-            createScreenElement('Tela 1', widthPx1, heightPx1, color1, monitorPPI);
+            createScreenElement('Tela 2', widthPx2, heightPx2, color2, monitorPPI); // <--- Corrigido: Passando a cor
+            createScreenElement('Tela 1', widthPx1, heightPx1, color1, monitorPPI); // <--- Corrigido: Passando a cor
         } else {
-            createScreenElement('Tela 1', widthPx1, heightPx1, color1, monitorPPI);
-            createScreenElement('Tela 2', widthPx2, heightPx2, color2, monitorPPI);
+            createScreenElement('Tela 1', widthPx1, heightPx1, color1, monitorPPI); // <--- Corrigido: Passando a cor
+            createScreenElement('Tela 2', widthPx2, heightPx2, color2, monitorPPI); // <--- Corrigido: Passando a cor
         }
     }
 
-    function parseRatio(ratioStr) { return ratioStr.includes(':') ? ratioStr.split(':').map(Number) : [16, 9]; }
+    function parseRatio(ratioStr) {
+        if (!ratioStr) return null;
+        const cleanRatio = ratioStr.split(' ')[0];
+        if (cleanRatio && cleanRatio.includes(':')) {
+            const parts = cleanRatio.split(':').map(Number);
+            if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1]) && parts[0] > 0 && parts[1] > 0) {
+                return parts;
+            }
+        }
+        return null;
+    }
 
     function calculateDimensions(diagonal, ratioStr) {
-        const [ratioW, ratioH] = parseRatio(ratioStr);
+        const ratioParts = parseRatio(ratioStr);
+        if (!ratioParts) return null;
+
+        const [ratioW, ratioH] = ratioParts;
         const r = ratioW / ratioH;
+        // Verifica se r é um número válido e diferente de zero para evitar divisão por zero ou NaN
+        if (isNaN(r) || r === 0) return null; 
+
         const height = diagonal / Math.sqrt(r*r + 1);
         const width = r * height;
+        
+        // Verifica se as dimensões calculadas são válidas
+        if (isNaN(width) || isNaN(height) || width <= 0 || height <= 0) return null;
+
         return { width, height };
     }
 
-    function createScreenElement(name, widthPx, heightPx, color, ppi) {
+    function createScreenElement(name, widthPx, heightPx, color, ppi) { // <--- Corrigido: Recebendo a cor
         const screenWrapper = document.createElement('div');
         screenWrapper.className = 'screen-wrapper';
         const screenDiv = document.createElement('div');
